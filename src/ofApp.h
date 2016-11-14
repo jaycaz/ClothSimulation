@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
+#include "ClothSim.h"
 
 class ofApp : public ofBaseApp{
 
@@ -23,7 +24,9 @@ class ofApp : public ofBaseApp{
 
 		bool drawFrames = true;
 
+		ClothSim sim;
+
 		ofCamera cam;
-		ofVboMesh mesh;
+		ofMesh mesh;
 		ofMatrix4x4 model;
 };
