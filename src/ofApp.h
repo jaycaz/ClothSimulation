@@ -21,6 +21,8 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 
+		bool drawFrames = true;
+
 		ofCamera cam;
 		ofVboMesh mesh;
 		ofMatrix4x4 model;
