@@ -2,7 +2,15 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
+	mesh = ofMesh::plane(4.0f, 4.0f, 10, 10);
+	auto mi = mesh.getIndices();
+	mesh.setColorForIndices(0, mi.size(), ofColor(255.0f));
 
+	model.makeRotationMatrix(90.0f, 1.0f, 0.0f, 0.0f);
+
+
+	cam.setPosition(0.0, 1.0, -10.0);
+	cam.lookAt(ofVec3f(0.0, -1.0, 0.0));
 }
 
 //--------------------------------------------------------------
@@ -12,7 +20,12 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-
+	cam.begin();
+	ofPushMatrix();
+	ofMultMatrix(model);
+	mesh.drawFaces();
+	ofPopMatrix();
+	cam.end();
 }
 
 //--------------------------------------------------------------
