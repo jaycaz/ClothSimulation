@@ -192,6 +192,7 @@
   <ItemGroup>
     <ClInclude Include="src\ClothSim.h" />
     <ClInclude Include="src\ofApp.h" />
+    <ClInclude Include="src\Utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ProjectExtensions>

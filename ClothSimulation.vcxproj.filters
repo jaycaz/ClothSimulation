@@ -26,5 +26,8 @@
     <ClInclude Include="src\ofApp.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="src\Utils.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

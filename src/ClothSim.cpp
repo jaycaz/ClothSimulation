@@ -1,4 +1,5 @@
 #include "ClothSim.h"
+#include "Utils.h"
 
 ClothSim::ClothSim()
 {
@@ -18,6 +19,12 @@ ClothSim::ClothSim(ofMesh *mesh)
 
 	extForce = vector<ofVec3f>(nPoints);
 	extForce.assign(nPoints, ofPoint(0.0f, -10.0f, 0.0f));
+
+	neighbors = vector<list<int>>(nPoints);
+	for (int i = 0; i < nPoints; i++)
+	{
+		neighbors[i] = list<int>();
+	}
 }
 
 void ClothSim::startStep()
@@ -27,6 +34,20 @@ void ClothSim::startStep()
 	{
 		vel[i] += DT * extForce[i] * MASS;
 		pos[i] += DT * vel[i];
+	}
+
+	for (int i = 0; i < nPoints; i++)
+	{
+		neighbors[i].clear();
+
+		for (int j = 0; j < nPoints; j++)
+		{
+			if (i == j) continue;
+			if (pos[i].distance(pos[j]) < NEIGHBOR_RADIUS)
+			{
+				neighbors[i].push_back(j);
+			}
+		}
 	}
 }
 

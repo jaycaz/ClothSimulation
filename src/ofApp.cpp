@@ -2,7 +2,13 @@
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-	mesh = ofMesh::plane(4.0f, 4.0f, 10, 10);
+
+	const float PLANE_WIDTH = 1.0f;
+	const float PLANE_HEIGHT = 1.0f;
+	const int POINTS_WIDTH = 10;
+	const int POINTS_HEIGHT = 10;
+
+	mesh = ofMesh::plane(PLANE_WIDTH, PLANE_HEIGHT, POINTS_WIDTH, POINTS_HEIGHT);
 	auto mi = mesh.getIndices();
 	mesh.getColors().resize(mi.size());
 	mesh.setColorForIndices(0, mi.size(), ofColor(255.0f));
@@ -16,8 +22,10 @@ void ofApp::setup(){
 
 	sim = ClothSim(&mesh);
 
-	cam.setPosition(0.0, 2.0, -10.0);
-	cam.lookAt(ofVec3f(0.0, -2.0, 0.0));
+	cam.setNearClip(0.1f);
+	cam.setFarClip(1000.0f);
+	cam.setPosition(0.0, 2.0, -4.0);
+	cam.lookAt(ofVec3f(0.0, -1.0, 0.0));
 }
 
 //--------------------------------------------------------------
@@ -35,6 +43,8 @@ void ofApp::update(){
 		}
 		sim.endStep();
 	}
+	
+	ofSleepMillis(100);
 }
 
 //--------------------------------------------------------------
