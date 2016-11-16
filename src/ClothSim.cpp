@@ -14,6 +14,9 @@ ClothSim::ClothSim(ofMesh *mesh)
 
 	pos = m->getVertices();
 
+	ppos = vector<ofVec3f>(nPoints);
+	ppos.assign(nPoints, ofPoint(0.0f));
+
 	vel = vector<ofVec3f>(nPoints);
 	vel.assign(nPoints, ofPoint(0.0f));
 
@@ -25,6 +28,17 @@ ClothSim::ClothSim(ofMesh *mesh)
 	{
 		neighbors[i] = list<int>();
 	}
+
+	// Initialize boundary planes
+	float bdry = BOUNDARY_SIZE / 2.0f;
+	planes = {
+		CollisionPlane(ofVec3f(bdry, 0.0f, 0.0f), ofVec3f(-1.0f, 0.0f, 0.0f)),
+		CollisionPlane(ofVec3f(0.0f, bdry, 0.0f), ofVec3f(0.0f, -1.0f, 0.0f)),
+		CollisionPlane(ofVec3f(0.0f, 0.0f, bdry), ofVec3f(0.0f, 0.0f, -1.0f)),
+		CollisionPlane(ofVec3f(-bdry, 0.0f, 0.0f), ofVec3f(1.0f, 0.0f, 0.0f)),
+		CollisionPlane(ofVec3f(0.0f, -bdry, 0.0f), ofVec3f(0.0f, 1.0f, 0.0f)),
+		CollisionPlane(ofVec3f(0.0f, 0.0f, -bdry), ofVec3f(0.0f, 0.0f, 1.0f))
+	};
 }
 
 void ClothSim::startStep()
@@ -33,7 +47,7 @@ void ClothSim::startStep()
 	for (int i = 0; i < nPoints; i++)
 	{
 		vel[i] += DT * extForce[i] * MASS;
-		pos[i] += DT * vel[i];
+		ppos[i] = pos[i] + DT * vel[i];
 	}
 
 	for (int i = 0; i < nPoints; i++)
@@ -43,7 +57,7 @@ void ClothSim::startStep()
 		for (int j = 0; j < nPoints; j++)
 		{
 			if (i == j) continue;
-			if (pos[i].distance(pos[j]) < NEIGHBOR_RADIUS)
+			if (ppos[i].distance(ppos[j]) < NEIGHBOR_RADIUS)
 			{
 				neighbors[i].push_back(j);
 			}
@@ -53,7 +67,22 @@ void ClothSim::startStep()
 
 void ClothSim::tick()
 {
-
+	// Check for point-plane collisions and respond
+	for (int i = 0; i < nPoints; i++)
+	{
+		for (int j = 0; j < planes.size(); j++)
+		{
+			ofVec3f planeToPart = ppos[i] - planes[j].origin;
+			float distToPlane = planeToPart.dot(planes[j].normal);
+			if (distToPlane < -0.001f)
+			{
+				// Collision: Apply simple position shift
+				pos[i] -= distToPlane * planes[j].normal * 0.5f;
+				ppos[i] -= distToPlane * planes[j].normal;
+				//particles[i].vel = particles[i].vel * 0.8f;
+			}
+		}
+	}
 }
 
 void ClothSim::endStep()
@@ -61,6 +90,7 @@ void ClothSim::endStep()
 	// Final mesh update
 	for (int i = 0; i < nPoints; i++)
 	{
+		pos[i] = ppos[i];
 		m->setVertex(i, pos[i]);
 	}
 }

@@ -1,8 +1,7 @@
 #include "ofApp.h"
 
-//--------------------------------------------------------------
-void ofApp::setup(){
-
+void ofApp::resetCloth()
+{
 	const float PLANE_WIDTH = 1.0f;
 	const float PLANE_HEIGHT = 1.0f;
 	const int POINTS_WIDTH = 10;
@@ -13,7 +12,9 @@ void ofApp::setup(){
 	mesh.getColors().resize(mi.size());
 	mesh.setColorForIndices(0, mi.size(), ofColor(255.0f));
 
-	model.makeRotationMatrix(90.0f, 1.0f, 0.0f, 0.0f);
+	model = ofMatrix4x4::newIdentityMatrix();
+	model.postMultRotate(30.0f, 1.0f, 0.0f, 0.0f);
+	model.postMultRotate(-75.0f, 0.0f, 1.0f, 0.0f);
 
 	for (int i = 0; i < mesh.getVertices().size(); i++)
 	{
@@ -22,10 +23,17 @@ void ofApp::setup(){
 
 	sim = ClothSim(&mesh);
 
+}
+
+//--------------------------------------------------------------
+void ofApp::setup(){
+
+	resetCloth();
+
 	cam.setNearClip(0.1f);
 	cam.setFarClip(1000.0f);
 	cam.setPosition(0.0, 2.0, -4.0);
-	cam.lookAt(ofVec3f(0.0, -1.0, 0.0));
+	cam.lookAt(ofVec3f(0.0, -1.0, 1.0));
 }
 
 //--------------------------------------------------------------
@@ -43,8 +51,6 @@ void ofApp::update(){
 		}
 		sim.endStep();
 	}
-	
-	ofSleepMillis(100);
 }
 
 //--------------------------------------------------------------
@@ -69,6 +75,11 @@ void ofApp::draw(){
 
 //--------------------------------------------------------------
 void ofApp::keyPressed(int key){
+
+	if (key == 'r')
+	{
+		resetCloth();
+	}
 
 	if (key == 'w')
 	{
