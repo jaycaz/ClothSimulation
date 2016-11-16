@@ -27,9 +27,13 @@ ClothSim::ClothSim(ofMesh *mesh)
 	pointMass = vector<float>(nPoints);
 	pointMass.assign(nPoints, 0.0f);
 
-	// Initialize triangle params
+	// Initialize triangle & edge params
 	nTris = m->getUniqueFaces().size();
 	cout << "nTriangles: " << nTris << endl;
+
+	restDist = vector<float>(nTris*3);
+	restDist.assign(nTris*3, -1.0f);
+
 
 	// Initialize boundary planes
 	float bdry = BOUNDARY_SIZE / 2.0f;
@@ -94,6 +98,35 @@ void ClothSim::tick()
 				ppos[i] -= distToPlane * planes[j].normal;
 				//particles[i].vel = particles[i].vel * 0.8f;
 			}
+		}
+	}
+
+	// Apply stretch constraints
+	for (int i = 0; i < nTris; i++)
+	{
+		// Iterate over all edges of the triangle
+		for (int j = 0; j < 3; j++)
+		{
+			int i0 = m->getIndex(i * 3 + (j % 3));
+			int i1 = m->getIndex(i * 3 + ((j + 1) % 3));
+			ofVec3f p0 = ppos[i0];
+			ofVec3f p1 = ppos[i1];
+
+			// Assume that the mesh at the beginning is in a rest state,
+			// i.e. the initial distances for edges are the rest distances
+			if (restDist[i*3+j] < 0)
+			{
+				restDist[i*3+j] = p0.distance(p1);
+			}
+
+			ofVec3f d = (p0 - p1);
+			ofVec3f dnorm = d.normalized();
+			float s = (p0.distance(p1) - restDist[i*3+j]) / ((1.0f / pointMass[i0]) + (1.0f / pointMass[i1]));
+			ofVec3f dp0 = (-1.0f / pointMass[i0]) * s * dnorm;
+			ofVec3f dp1 = (1.0f / pointMass[i1]) * s * dnorm;
+
+			ppos[i0] += dp0;
+			ppos[i1] += dp1;
 		}
 	}
 }

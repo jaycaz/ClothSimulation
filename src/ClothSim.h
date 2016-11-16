@@ -4,7 +4,7 @@
 
 const int N_STEPS_PER_FRAME = 2;
 const int N_TICKS_PER_STEP = 4;
-const float RUN_SPEED = 0.25f;
+const float RUN_SPEED = 0.0625f;
 const float TIME_PER_STEP = 0.0083f * RUN_SPEED;
 const float INV_TIME_PER_STEP = 1.0f / TIME_PER_STEP;
 const float DT = N_STEPS_PER_FRAME * TIME_PER_STEP;
@@ -35,6 +35,7 @@ class ClothSim
 		vector<float> pointMass; // Mass of each point at the start of frame
 		vector<ofVec3f> extForce;
 		vector<CollisionPlane> planes;
+		vector<float> restDist;
 
 		ClothSim();
 		ClothSim(ofMesh *mesh);
