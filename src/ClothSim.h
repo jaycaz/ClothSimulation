@@ -29,12 +29,11 @@ class ClothSim
 		// Simulation parameters
 		int nPoints;
 		int nTris;
-		float pointMass;
 		ofMesh *m;
 		vector<ofVec3f> pos; // positions
 		vector<ofVec3f> ppos; // predicted positions
 		vector<ofVec3f> vel;
-		vector<float> triMass; // Mass of each triangle at start of frame
+		vector<float> pointMass; // Mass of each point at the start of frame
 		vector<ofVec3f> extForce;
 		vector<list<int>> neighbors;
 		vector<CollisionPlane> planes;

@@ -10,6 +10,7 @@ ClothSim::ClothSim(ofMesh *mesh)
 	// Initialize simulation
 	m = mesh;
 	nPoints = m->getVertices().size();
+	cout << "nPoints: " << nPoints << endl;
 
 	// Initialize point params
 	pos = m->getVertices();
@@ -23,11 +24,12 @@ ClothSim::ClothSim(ofMesh *mesh)
 	extForce = vector<ofVec3f>(nPoints);
 	extForce.assign(nPoints, ofPoint(0.0f, -10.0f, 0.0f));
 
+	pointMass = vector<float>(nPoints);
+	pointMass.assign(nPoints, 0.0f);
+
 	// Initialize triangle params
 	nTris = m->getUniqueFaces().size();
 	cout << "nTriangles: " << nTris << endl;
-
-	triMass = vector<float>(nTris);
 
 	neighbors = vector<list<int>>(nPoints);
 	for (int i = 0; i < nPoints; i++)
@@ -72,6 +74,7 @@ void ClothSim::startStep()
 	}
 
 	// Perform triangle mass calculation
+	pointMass.assign(nPoints, 0.0f);
 	for (int i = 0; i < nTris; i++)
 	{
 		ofMeshFace tri = m->getFace(i);
@@ -80,9 +83,19 @@ void ClothSim::startStep()
 		ofVec3f faceNormal = U.getCrossed(V);
 		float triArea = faceNormal.length() / 2.0f;
 
-		m->setColor(i, Utils::Debug1D(triArea * 162.0f));
+		float triMass = DENSITY * triArea;
 
-		triMass[i] = DENSITY * triArea;
+		// update point with one third of this triangle's mass
+		for (int j = i * 3; j < i * 3 + 3; j++)
+		{
+			pointMass[m->getIndex(j)] += triMass;
+		}
+	}
+
+	for (int i = 0; i < nPoints; i++)
+	{
+		pointMass[i] /= 3.0f;
+		m->setColor(i, Utils::Debug1D(pointMass[i] * 54));
 	}
 }
 
