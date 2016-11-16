@@ -5,16 +5,16 @@ class Utils
 public:
 	static ofColor Debug1D(float measurement)
 	{
-		float base = 5.0f;
+		float base = 0.0f;
 		float val = measurement * 255;
 
 		if (measurement < 0.0f)
 		{
 			return ofColor(base + abs(val), base, base);
 		}
-		else if (measurement < 0.999f)
+		else if (measurement < 1.001f)
 		{
-			return ofColor(base + val * 255);
+			return ofColor(base + val);
 		}
 		else
 		{

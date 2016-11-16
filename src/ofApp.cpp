@@ -7,7 +7,7 @@ void ofApp::resetCloth()
 	const int POINTS_WIDTH = 10;
 	const int POINTS_HEIGHT = 10;
 
-	mesh = ofMesh::plane(PLANE_WIDTH, PLANE_HEIGHT, POINTS_WIDTH, POINTS_HEIGHT);
+	mesh = ofMesh::plane(PLANE_WIDTH, PLANE_HEIGHT, POINTS_WIDTH, POINTS_HEIGHT, OF_PRIMITIVE_TRIANGLES);
 	auto mi = mesh.getIndices();
 	mesh.getColors().resize(mi.size());
 	mesh.setColorForIndices(0, mi.size(), ofColor(255.0f));
