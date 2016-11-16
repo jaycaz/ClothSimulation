@@ -13,7 +13,6 @@ const float DENSITY = 0.5f;
 const float BOUNDARY_SIZE = 3.0f;
 
 const float MASS = 1.0f;
-const float NEIGHBOR_RADIUS = 0.2f;
 
 struct CollisionPlane
 {
@@ -35,7 +34,6 @@ class ClothSim
 		vector<ofVec3f> vel;
 		vector<float> pointMass; // Mass of each point at the start of frame
 		vector<ofVec3f> extForce;
-		vector<list<int>> neighbors;
 		vector<CollisionPlane> planes;
 
 		ClothSim();

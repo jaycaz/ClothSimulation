@@ -31,12 +31,6 @@ ClothSim::ClothSim(ofMesh *mesh)
 	nTris = m->getUniqueFaces().size();
 	cout << "nTriangles: " << nTris << endl;
 
-	neighbors = vector<list<int>>(nPoints);
-	for (int i = 0; i < nPoints; i++)
-	{
-		neighbors[i] = list<int>();
-	}
-
 	// Initialize boundary planes
 	float bdry = BOUNDARY_SIZE / 2.0f;
 	planes = {
@@ -56,21 +50,6 @@ void ClothSim::startStep()
 	{
 		vel[i] += DT * extForce[i] * MASS;
 		ppos[i] = pos[i] + DT * vel[i];
-	}
-
-	// Perform nearest neighbor calculation
-	for (int i = 0; i < nPoints; i++)
-	{
-		neighbors[i].clear();
-
-		for (int j = 0; j < nPoints; j++)
-		{
-			if (i == j) continue;
-			if (ppos[i].distance(ppos[j]) < NEIGHBOR_RADIUS)
-			{
-				neighbors[i].push_back(j);
-			}
-		}
 	}
 
 	// Perform triangle mass calculation
