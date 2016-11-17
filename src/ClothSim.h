@@ -21,6 +21,17 @@ struct CollisionPlane
 	ofVec3f		normal;
 };
 
+struct Tetrahedron
+{
+	// Shared points
+	ofIndexType p1;
+	ofIndexType p2;
+
+	// End points
+	ofIndexType p3;
+	ofIndexType p4;
+};
+
 // Uses Position Based Dynamics to simulate cloth
 class ClothSim
 {
@@ -28,6 +39,8 @@ class ClothSim
 		// Simulation parameters
 		int nPoints;
 		int nTris;
+		vector<Tetrahedron> tets;
+
 		ofMesh *m;
 		vector<ofVec3f> pos; // positions
 		vector<ofVec3f> ppos; // predicted positions
@@ -36,6 +49,8 @@ class ClothSim
 		vector<ofVec3f> extForce;
 		vector<CollisionPlane> planes;
 		vector<float> restDist;
+		vector<float> restBend;
+		
 
 		ClothSim();
 		ClothSim(ofMesh *mesh);
