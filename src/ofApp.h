@@ -28,10 +28,9 @@ class ofApp : public ofBaseApp{
 		bool paused = false;
 		bool camMode = false;
 
-
 		ofPoint mouse;
 		ofIndexType selectIndex;
-		PointPin selectPin;
+		PointPin *selectPin;
 		ofVec3f selectStart;
 
 		ClothSim sim;

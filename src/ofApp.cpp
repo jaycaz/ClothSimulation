@@ -10,7 +10,7 @@ void ofApp::resetCloth()
 	mesh = ofMesh::plane(PLANE_WIDTH, PLANE_HEIGHT, POINTS_WIDTH, POINTS_HEIGHT, OF_PRIMITIVE_TRIANGLES);
 	auto mi = mesh.getIndices();
 	mesh.getColors().resize(mi.size());
-	mesh.setColorForIndices(0, mi.size(), ofColor::gray);
+	mesh.setColorForIndices(0, mi.size(), ofColor::white);
 	
 	model = ofMatrix4x4::newIdentityMatrix();
 	model.postMultRotate(40.0f, 1.0f, 0.0f, 0.0f);
@@ -21,6 +21,11 @@ void ofApp::resetCloth()
 		mesh.setVertex(i, model * mesh.getVertex(i));
 	}
 
+	//ofImage image;
+	//image.loadImage("textile.jpg");
+	//ofTexture tex = image.getTextureReference();
+	//mesh.addTexCoords(tex.
+
 	sim = ClothSim(&mesh);
 
 }
@@ -28,14 +33,23 @@ void ofApp::resetCloth()
 //--------------------------------------------------------------
 void ofApp::setup(){
 
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
+
 	resetCloth();
 
+	// Setup light
 	light = ofLight();
+	light.setAmbientColor(ofColor(10.0f));
 	light.setDiffuseColor(ofColor(ofColor::white));
+	light.setSpecularColor(ofColor(ofColor::white));
 	light.lookAt(ofVec3f(1.0f, 0.0f, 0.0f));
 	light.setPosition(ofVec3f(0.0f, 0.0f, 0.0f));
-	light.setDirectional();
+	light.setScale(ofVec3f(1.0f));
+	light.setAttenuation(1.0f, 1.0f, 1.0f);
+	light.setPointLight();
 
+	// Setup camera
 	cam.setAutoDistance(false);
 	cam.disableMouseInput();
 	cam.setNearClip(0.1f);
@@ -43,6 +57,7 @@ void ofApp::setup(){
 	cam.setPosition(ofVec3f(0.0f, 0.0f, -4.0f));
 	cam.lookAt(ofVec3f(0.0f, -1.0f, 0.0f), ofVec3f(0.0f, 1.0f, 0.0f));
 	cam.setTarget(ofVec3f(0.0f, -1.0f, 0.0f));
+
 }
 
 //--------------------------------------------------------------
@@ -69,14 +84,8 @@ void ofApp::draw(){
 	ofClear(50.0f);
 
 	// Start camera
-	light.enable();
-
 	cam.begin();
-
-	// Add lights
-	//ofVec3f c = cam.getGlobalPosition();
-	//ofSetLineWidth(2.0f);
-	//ofDrawLine(c, c + (mouseWorld - c) * 2.0f + ofVec3f(0.0f, 0.5f, 0.0f));
+	light.enable();
 
 	if (drawFrames)
 	{
@@ -87,8 +96,8 @@ void ofApp::draw(){
 		mesh.drawWireframe();
 	}
 
-	cam.end();
 	light.disable();
+	cam.end();
 
 }
 
@@ -152,7 +161,7 @@ void ofApp::mouseMoved(int x, int y ){
 				selectIndex = i;
 				minDist = dist;
 			}
-			mesh.setColor(i, ofColor::gray);
+			mesh.setColor(i, ofColor::white);
 		}
 
 		mesh.setColor(selectIndex, ofColor::green);
@@ -163,12 +172,12 @@ void ofApp::mouseMoved(int x, int y ){
 void ofApp::mouseDragged(int x, int y, int button){
 	if (!camMode)
 	{
-		if (button == OF_MOUSE_BUTTON_LEFT)
+		if (button == OF_MOUSE_BUTTON_LEFT || button == OF_MOUSE_BUTTON_RIGHT)
 		{
 			ofPoint dm = cam.screenToWorld(ofPoint(x, y)) - cam.screenToWorld(mouse);
 			cout << "(dx,dy,dz) = " << dm << endl;
 
-			selectPin.target = selectStart + dm * MOUSE_DRAG_MULT;
+			selectPin->target = selectStart + dm * MOUSE_DRAG_MULT;
 		}
 	}
 }
@@ -179,20 +188,21 @@ void ofApp::mousePressed(int x, int y, int button){
 	{
 		if (selectIndex >= 0 && selectIndex < mesh.getNumVertices())
 		{
-			selectPin = PointPin();
-			selectPin.v = selectIndex;
-			selectPin.target = mesh.getVertex(selectIndex);
+			selectPin = new PointPin();
+			selectPin->v = selectIndex;
+			selectPin->target = mesh.getVertex(selectIndex);
 			selectStart = ofVec3f(mesh.getVertex(selectIndex));
-			sim.addPointPin(&selectPin);
+			sim.addPointPin(selectPin);
 		}
 	}
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
-	if (!camMode)
+	if (!camMode && button == OF_MOUSE_BUTTON_LEFT)
 	{
-		sim.removePointPin(&selectPin);
+		sim.removePointPin(selectPin);
+		delete selectPin;
 	}
 }
 

@@ -128,6 +128,8 @@ void ClothSim::startStep()
 {
 	// Perform triangle mass calculation
 	invPointMass.assign(nPoints, 0.0f);
+	vector<ofPoint> n = m->getNormals();
+	n.assign(nPoints, ofPoint());
 	auto nPointTris = vector<int>(nPoints);
 	for (int i = 0; i < nTris; i++)
 	{
@@ -138,11 +140,13 @@ void ClothSim::startStep()
 		float triArea = faceNormal.length() / 2.0f;
 
 		float triMass = DENSITY * triArea;
-		// Collect average mass over three triangles, then invert it
+		// Collect average mass over adjacent triangles
+		// Also collect normals for rendering
 		for (int j = i * 3; j < i * 3 + 3; j++)
 		{
 			invPointMass[m->getIndex(j)] += triMass;
 			nPointTris[m->getIndex(j)] += 1;
+			n[m->getIndex(j)] += faceNormal.normalized();
 		}
 	}
 
@@ -150,6 +154,7 @@ void ClothSim::startStep()
 	{
 		invPointMass[i] /= nPointTris[i];
 		invPointMass[i] = 1.0f / invPointMass[i];
+		m->setNormal(i, n[i] / nPointTris[i]);
 		//m->setColor(i, Utils::Debug1D(324.0f / invPointMass[i]));
 	}
 
@@ -162,7 +167,7 @@ void ClothSim::startStep()
 		invPointMass[p->v] = 0.0f; // Infinite mass
 	}
 
-	// Apply external forces, i.e. gravity
+	// Apply external forces, i.e. gravit
 	for (int i = 0; i < nPoints; i++)
 	{
 		vel[i] += DT * extForce[i];

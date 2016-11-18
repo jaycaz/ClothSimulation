@@ -3,7 +3,7 @@
 #include "ofMain.h"
 
 const int N_STEPS_PER_FRAME = 2;
-const int N_TICKS_PER_STEP = 3;
+const int N_TICKS_PER_STEP = 4;
 const float RUN_SPEED = 1.0f;
 const float TIME_PER_STEP = 0.0083f * RUN_SPEED;
 const float INV_TIME_PER_STEP = 1.0f / TIME_PER_STEP;
@@ -13,7 +13,7 @@ const float DENSITY = 0.5f;
 const float BEND_STRENGTH = 0.01f;
 const float STRETCH_STRENGTH = 0.1f;
 
-const float MOUSE_DRAG_MULT = 5.0f;
+const float MOUSE_DRAG_MULT = 10.0f;
 
 const float BOUNDARY_SIZE = 3.0f;
 
