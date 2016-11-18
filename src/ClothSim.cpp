@@ -158,6 +158,12 @@ void ClothSim::startStep()
 		//m->setColor(i, Utils::Debug1D(324.0f / invPointMass[i]));
 	}
 
+	// Apply external forces, i.e. gravity
+	for (int i = 0; i < nPoints; i++)
+	{
+		vel[i] += DT * extForce[i];
+	}
+
 	// Apply point pin constraints, if any
 	for(auto it = pins.begin(); it != pins.end(); it++)
 	{
@@ -167,10 +173,53 @@ void ClothSim::startStep()
 		invPointMass[p->v] = 0.0f; // Infinite mass
 	}
 
-	// Apply external forces, i.e. gravit
+	// Calculate velocity damping
+	ofVec3f xcm, vcm;
+	float totalMass = 0.0f;
 	for (int i = 0; i < nPoints; i++)
 	{
-		vel[i] += DT * extForce[i];
+		if (invPointMass[i] == 0)
+			continue;
+		float ptMass = 1.0f / invPointMass[i];
+		xcm += pos[i] * ptMass;
+		vcm += vel[i] * ptMass;
+		totalMass += ptMass;
+	}
+	xcm /= totalMass;
+	vcm /= totalMass;
+
+	ofVec3f L;
+	ofMatrix3x3 I;
+	auto r = vector<ofVec3f>(nPoints);
+	for (int i = 0; i < nPoints; i++)
+	{
+		float ptMass = 1.0f / invPointMass[i];
+		r[i] = pos[i] - xcm;
+		L += r[i].crossed(ptMass * vel[i]);
+
+		ofMatrix3x3 ricross = ofMatrix3x3(0.0f, r[i].z, -r[i].y, -r[i].z, 0.0f, r[i].x, r[i].y, -r[i].x, 0.0f);
+		ofMatrix3x3 ricrossT = ofMatrix3x3(ricross);
+		ricrossT.transpose();
+		I += (ricross * ricrossT) * ptMass;
+	}
+
+	I.invert();
+	ofVec3f omega = ofVec3f(
+		I.a * L.x + I.b * L.y + I.c * L.z,
+		I.d * L.x + I.e * L.y + I.f * L.z,
+		I.g * L.x + I.h * L.y + I.i * L.z
+	);
+
+	// Apply velocity damping result
+	for (int i = 0; i < nPoints; i++)
+	{
+		//vel[i] += DAMPING_K * (vcm + omega.crossed(r[i]) - vel[i]);
+		ofVec3f dv = DAMPING_K * (vcm + omega.crossed(r[i]) - vel[i]);
+	}
+
+	// Find intial position prediction
+	for (int i = 0; i < nPoints; i++)
+	{
 		ppos[i] = pos[i] + DT * vel[i];
 	}
 

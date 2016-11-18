@@ -28,6 +28,8 @@ class ofApp : public ofBaseApp{
 		bool paused = false;
 		bool camMode = false;
 
+		ofColor defaultColor = ofColor::darkRed;
+
 		ofPoint mouse;
 		ofIndexType selectIndex;
 		PointPin *selectPin;

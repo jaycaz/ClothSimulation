@@ -30,12 +30,4 @@
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
-  <ItemGroup>
-    <None Include="bin\data\shaders\lightShader.frag">
-      <Filter>src</Filter>
-    </None>
-    <None Include="bin\data\shaders\lightShader.vert">
-      <Filter>src</Filter>
-    </None>
-  </ItemGroup>
 </Project>

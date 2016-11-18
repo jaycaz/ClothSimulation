@@ -10,8 +10,9 @@ const float INV_TIME_PER_STEP = 1.0f / TIME_PER_STEP;
 const float DT = N_STEPS_PER_FRAME * TIME_PER_STEP;
 const float DENSITY = 0.5f;
 
-const float BEND_STRENGTH = 0.01f;
-const float STRETCH_STRENGTH = 0.1f;
+const float DAMPING_K = 1.0f; // range: [0.0, 1.0]
+const float BEND_STRENGTH = 0.005f;
+const float STRETCH_STRENGTH = 1.0f;
 
 const float MOUSE_DRAG_MULT = 10.0f;
 
@@ -42,6 +43,14 @@ struct PointPin
 {
 	ofIndexType v;
 	ofPoint target;
+
+	PointPin() {}
+
+	PointPin(ofIndexType vv, ofPoint &tgt)
+	{
+		v = vv;
+		target = tgt;
+	}
 };
 
 // Uses Position Based Dynamics to simulate cloth

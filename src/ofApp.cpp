@@ -10,11 +10,11 @@ void ofApp::resetCloth()
 	mesh = ofMesh::plane(PLANE_WIDTH, PLANE_HEIGHT, POINTS_WIDTH, POINTS_HEIGHT, OF_PRIMITIVE_TRIANGLES);
 	auto mi = mesh.getIndices();
 	mesh.getColors().resize(mi.size());
-	mesh.setColorForIndices(0, mi.size(), ofColor::white);
+	mesh.setColorForIndices(0, mi.size(), defaultColor);
 	
 	model = ofMatrix4x4::newIdentityMatrix();
-	model.postMultRotate(40.0f, 1.0f, 0.0f, 0.0f);
-	model.postMultRotate(-75.0f, 0.0f, 1.0f, 0.0f);
+	model.postMultRotate(00.0f, 1.0f, 0.0f, 0.0f);
+	model.postMultRotate(-50.0f, 0.0f, 1.0f, 0.0f);
 
 	for (int i = 0; i < mesh.getVertices().size(); i++)
 	{
@@ -27,6 +27,9 @@ void ofApp::resetCloth()
 	//mesh.addTexCoords(tex.
 
 	sim = ClothSim(&mesh);
+	int nPoints = POINTS_WIDTH * POINTS_HEIGHT;
+	sim.addPointPin(new PointPin(1558, mesh.getVertex(1558)));
+	sim.addPointPin(new PointPin(1521, mesh.getVertex(1521)));
 
 }
 
@@ -40,12 +43,12 @@ void ofApp::setup(){
 
 	// Setup light
 	light = ofLight();
-	light.setAmbientColor(ofColor(10.0f));
+	light.setAmbientColor(ofColor(20.0f));
 	light.setDiffuseColor(ofColor(ofColor::white));
 	light.setSpecularColor(ofColor(ofColor::white));
 	light.lookAt(ofVec3f(1.0f, 0.0f, 0.0f));
 	light.setPosition(ofVec3f(0.0f, 0.0f, 0.0f));
-	light.setScale(ofVec3f(1.0f));
+	light.setScale(ofVec3f(4.0f));
 	light.setAttenuation(1.0f, 1.0f, 1.0f);
 	light.setPointLight();
 
@@ -161,10 +164,11 @@ void ofApp::mouseMoved(int x, int y ){
 				selectIndex = i;
 				minDist = dist;
 			}
-			mesh.setColor(i, ofColor::white);
+			mesh.setColor(i, defaultColor);
 		}
 
 		mesh.setColor(selectIndex, ofColor::green);
+		cout << "Selected: " << selectIndex << " at " << mesh.getVertex(selectIndex) << endl;
 	}
 }
 
@@ -172,7 +176,7 @@ void ofApp::mouseMoved(int x, int y ){
 void ofApp::mouseDragged(int x, int y, int button){
 	if (!camMode)
 	{
-		if (button == OF_MOUSE_BUTTON_LEFT || button == OF_MOUSE_BUTTON_RIGHT)
+		if (selectPin && button == OF_MOUSE_BUTTON_LEFT || button == OF_MOUSE_BUTTON_RIGHT)
 		{
 			ofPoint dm = cam.screenToWorld(ofPoint(x, y)) - cam.screenToWorld(mouse);
 			cout << "(dx,dy,dz) = " << dm << endl;
@@ -199,7 +203,7 @@ void ofApp::mousePressed(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
-	if (!camMode && button == OF_MOUSE_BUTTON_LEFT)
+	if (selectPin && !camMode && button == OF_MOUSE_BUTTON_LEFT)
 	{
 		sim.removePointPin(selectPin);
 		delete selectPin;
