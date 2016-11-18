@@ -37,6 +37,7 @@ void ofApp::setup(){
 	light.setPointLight();
 
 	cam.setAutoDistance(false);
+	cam.disableMouseInput();
 	cam.setNearClip(0.1f);
 	cam.setFarClip(1000.0f);
 	cam.setPosition(ofVec3f(0.0f, 0.0f, -4.0f));
@@ -73,6 +74,9 @@ void ofApp::draw(){
 	cam.begin();
 
 	// Add lights
+	//ofVec3f c = cam.getGlobalPosition();
+	//ofSetLineWidth(2.0f);
+	//ofDrawLine(c, c + (mouseWorld - c) * 2.0f + ofVec3f(0.0f, 0.5f, 0.0f));
 
 	if (drawFrames)
 	{
@@ -89,7 +93,7 @@ void ofApp::draw(){
 }
 
 //--------------------------------------------------------------
-void ofApp::keyPressed(int key){
+void ofApp::keyPressed(int key) {
 
 	if (key == 'r')
 	{
@@ -112,21 +116,59 @@ void ofApp::keyPressed(int key){
 		update();
 		paused = !paused;
 	}
+
+	if (key == OF_KEY_CONTROL)
+	{
+		camMode = true;
+		cam.enableMouseInput();
+	}
 }
 
 //--------------------------------------------------------------
 void ofApp::keyReleased(int key){
 
+	if (key == OF_KEY_CONTROL)
+	{
+		camMode = false;
+		cam.disableMouseInput();
+	}
+
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y ){
+	if (!camMode)
+	{
+		ofPoint mouse(x, y);
 
+		float minDist = numeric_limits<float>::max();
+		int closestVertex = -1;
+		// Detect closest point to mouse and highlight it
+		for (int i = 0; i < mesh.getVertices().size(); i++)
+		{
+			ofPoint vertex = cam.worldToScreen(mesh.getVertex(i));
+			float dist = vertex.distanceSquared(mouse);
+			if (dist < minDist)
+			{
+				closestVertex = i;
+				minDist = dist;
+			}
+			mesh.setColor(i, ofColor::gray);
+		}
+
+		mesh.setColor(closestVertex, ofColor::green);
+	}
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseDragged(int x, int y, int button){
-
+	if (!camMode)
+	{
+		if (button == OF_MOUSE_BUTTON_LEFT)
+		{
+			
+		}
+	}
 }
 
 //--------------------------------------------------------------

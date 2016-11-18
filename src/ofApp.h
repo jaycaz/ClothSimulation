@@ -27,6 +27,9 @@ class ofApp : public ofBaseApp{
 
 		bool drawFrames = true;
 		bool paused = false;
+		bool camMode = false;
+
+		ofVec3f mouseWorld;
 
 		ClothSim sim;
 
