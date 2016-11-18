@@ -34,6 +34,8 @@ ClothSim::ClothSim(ofMesh *mesh)
 	restDist = vector<float>(nTris * 3);
 	restDist.assign(nTris * 3, -1.0f);
 
+	pins = set<PointPin*>();
+
 	//// Calculate mesh tetrahedrons (pairs of triangles that share an edge)
 	tets = vector<Tetrahedron>();
 	auto prevTriPoint = vector<vector<ofIndexType>>(nPoints);
@@ -109,16 +111,21 @@ ClothSim::ClothSim(ofMesh *mesh)
 	};
 }
 
+void ClothSim::addPointPin(PointPin *p)
+{
+	pins.insert(p);
+}
+
+void ClothSim::removePointPin(PointPin *p)
+{
+	if (pins.count(p) > 0)
+	{
+		pins.erase(p);
+	}
+}
+
 void ClothSim::startStep()
 {
-	// Apply external forces, i.e. gravity
-	for (int i = 0; i < nPoints; i++)
-	{
-		// TODO: Replace MASS with 1/invmass?
-		vel[i] += DT * extForce[i] * MASS;
-		ppos[i] = pos[i] + DT * vel[i];
-	}
-
 	// Perform triangle mass calculation
 	invPointMass.assign(nPoints, 0.0f);
 	auto nPointTris = vector<int>(nPoints);
@@ -144,6 +151,22 @@ void ClothSim::startStep()
 		invPointMass[i] /= nPointTris[i];
 		invPointMass[i] = 1.0f / invPointMass[i];
 		//m->setColor(i, Utils::Debug1D(324.0f / invPointMass[i]));
+	}
+
+	// Apply point pin constraints, if any
+	for(auto it = pins.begin(); it != pins.end(); it++)
+	{
+		PointPin *p = *it;
+		pos[p->v] = p->target;
+		vel[p->v] = ofVec3f();
+		invPointMass[p->v] = 0.0f; // Infinite mass
+	}
+
+	// Apply external forces, i.e. gravity
+	for (int i = 0; i < nPoints; i++)
+	{
+		vel[i] += DT * extForce[i];
+		ppos[i] = pos[i] + DT * vel[i];
 	}
 
 }
@@ -235,6 +258,7 @@ void ClothSim::endStep()
 	// Final mesh update
 	for (int i = 0; i < nPoints; i++)
 	{
+		vel[i] = (ppos[i] - pos[i]) / DT;
 		pos[i] = ppos[i];
 		m->setVertex(i, pos[i]);
 	}

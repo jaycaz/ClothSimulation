@@ -22,14 +22,17 @@ class ofApp : public ofBaseApp{
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
 
-
 		void resetCloth();
 
 		bool drawFrames = true;
 		bool paused = false;
 		bool camMode = false;
 
-		ofVec3f mouseWorld;
+
+		ofPoint mouse;
+		ofIndexType selectIndex;
+		PointPin selectPin;
+		ofVec3f selectStart;
 
 		ClothSim sim;
 

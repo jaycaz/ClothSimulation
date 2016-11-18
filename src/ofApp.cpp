@@ -10,7 +10,7 @@ void ofApp::resetCloth()
 	mesh = ofMesh::plane(PLANE_WIDTH, PLANE_HEIGHT, POINTS_WIDTH, POINTS_HEIGHT, OF_PRIMITIVE_TRIANGLES);
 	auto mi = mesh.getIndices();
 	mesh.getColors().resize(mi.size());
-	mesh.setColorForIndices(0, mi.size(), ofColor(100.0f));
+	mesh.setColorForIndices(0, mi.size(), ofColor::gray);
 	
 	model = ofMatrix4x4::newIdentityMatrix();
 	model.postMultRotate(40.0f, 1.0f, 0.0f, 0.0f);
@@ -32,9 +32,9 @@ void ofApp::setup(){
 
 	light = ofLight();
 	light.setDiffuseColor(ofColor(ofColor::white));
-	light.setSpecularColor(ofColor(ofColor::whiteSmoke));
-	light.setPosition(ofVec3f(0.0f, 0.0f, 2.0f));
-	light.setPointLight();
+	light.lookAt(ofVec3f(1.0f, 0.0f, 0.0f));
+	light.setPosition(ofVec3f(0.0f, 0.0f, 0.0f));
+	light.setDirectional();
 
 	cam.setAutoDistance(false);
 	cam.disableMouseInput();
@@ -137,12 +137,11 @@ void ofApp::keyReleased(int key){
 
 //--------------------------------------------------------------
 void ofApp::mouseMoved(int x, int y ){
+	mouse = ofPoint(x, y);
+
 	if (!camMode)
 	{
-		ofPoint mouse(x, y);
-
 		float minDist = numeric_limits<float>::max();
-		int closestVertex = -1;
 		// Detect closest point to mouse and highlight it
 		for (int i = 0; i < mesh.getVertices().size(); i++)
 		{
@@ -150,13 +149,13 @@ void ofApp::mouseMoved(int x, int y ){
 			float dist = vertex.distanceSquared(mouse);
 			if (dist < minDist)
 			{
-				closestVertex = i;
+				selectIndex = i;
 				minDist = dist;
 			}
 			mesh.setColor(i, ofColor::gray);
 		}
 
-		mesh.setColor(closestVertex, ofColor::green);
+		mesh.setColor(selectIndex, ofColor::green);
 	}
 }
 
@@ -166,19 +165,35 @@ void ofApp::mouseDragged(int x, int y, int button){
 	{
 		if (button == OF_MOUSE_BUTTON_LEFT)
 		{
-			
+			ofPoint dm = cam.screenToWorld(ofPoint(x, y)) - cam.screenToWorld(mouse);
+			cout << "(dx,dy,dz) = " << dm << endl;
+
+			selectPin.target = selectStart + dm * MOUSE_DRAG_MULT;
 		}
 	}
 }
 
 //--------------------------------------------------------------
 void ofApp::mousePressed(int x, int y, int button){
-
+	if (!camMode)
+	{
+		if (selectIndex >= 0 && selectIndex < mesh.getNumVertices())
+		{
+			selectPin = PointPin();
+			selectPin.v = selectIndex;
+			selectPin.target = mesh.getVertex(selectIndex);
+			selectStart = ofVec3f(mesh.getVertex(selectIndex));
+			sim.addPointPin(&selectPin);
+		}
+	}
 }
 
 //--------------------------------------------------------------
 void ofApp::mouseReleased(int x, int y, int button){
-
+	if (!camMode)
+	{
+		sim.removePointPin(&selectPin);
+	}
 }
 
 //--------------------------------------------------------------

@@ -3,8 +3,8 @@
 #include "ofMain.h"
 
 const int N_STEPS_PER_FRAME = 2;
-const int N_TICKS_PER_STEP = 4;
-const float RUN_SPEED = 1 / 2.0f;
+const int N_TICKS_PER_STEP = 3;
+const float RUN_SPEED = 1.0f;
 const float TIME_PER_STEP = 0.0083f * RUN_SPEED;
 const float INV_TIME_PER_STEP = 1.0f / TIME_PER_STEP;
 const float DT = N_STEPS_PER_FRAME * TIME_PER_STEP;
@@ -12,6 +12,8 @@ const float DENSITY = 0.5f;
 
 const float BEND_STRENGTH = 0.01f;
 const float STRETCH_STRENGTH = 0.1f;
+
+const float MOUSE_DRAG_MULT = 5.0f;
 
 const float BOUNDARY_SIZE = 3.0f;
 
@@ -35,6 +37,13 @@ struct Tetrahedron
 	ofIndexType p4;
 };
 
+// Constrains a particular mesh vertex to be pinned to a point in space
+struct PointPin
+{
+	ofIndexType v;
+	ofPoint target;
+};
+
 // Uses Position Based Dynamics to simulate cloth
 class ClothSim
 {
@@ -54,9 +63,14 @@ class ClothSim
 		vector<float> restDist;
 		vector<float> restBend;
 		
+		// List of point pin constraints
+		set<PointPin*> pins;
 
 		ClothSim();
 		ClothSim(ofMesh *mesh);
+
+		void addPointPin(PointPin *p);
+		void removePointPin(PointPin *p);
 
 		void startStep();
 		void tick();
