@@ -29,7 +29,7 @@ class ofApp : public ofBaseApp{
 
 		ClothSim sim;
 
-		ofCamera cam;
+		ofEasyCam cam;
 		ofMesh mesh;
 		ofMatrix4x4 model;
 };

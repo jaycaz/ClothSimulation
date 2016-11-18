@@ -42,7 +42,7 @@ ClothSim::ClothSim(ofMesh *mesh)
 		auto v = vector<ofIndexType>(nPoints);
 		v.assign(nPoints, numeric_limits<ofIndexType>::max());
 		prevTriPoint[i] = v;
-		m->setColor(i, ofColor(0.0f));
+		//m->setColor(i, ofColor(0.0f));
 	}
 
 	for (int i = 0; i < m->getIndices().size(); i+=3)
@@ -143,7 +143,7 @@ void ClothSim::startStep()
 	{
 		invPointMass[i] /= nPointTris[i];
 		invPointMass[i] = 1.0f / invPointMass[i];
-		m->setColor(i, Utils::Debug1D(324.0f / invPointMass[i]));
+		//m->setColor(i, Utils::Debug1D(324.0f / invPointMass[i]));
 	}
 
 }

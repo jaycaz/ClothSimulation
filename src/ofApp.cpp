@@ -2,23 +2,23 @@
 
 void ofApp::resetCloth()
 {
-	const float PLANE_WIDTH = 1.0f;
-	const float PLANE_HEIGHT = 1.0f;
-	const int POINTS_WIDTH = 10;
-	const int POINTS_HEIGHT = 10;
+	const float PLANE_WIDTH = 2.0f;
+	const float PLANE_HEIGHT = 2.0f;
+	const int POINTS_WIDTH = 40;
+	const int POINTS_HEIGHT = 40;
 
 	mesh = ofMesh::plane(PLANE_WIDTH, PLANE_HEIGHT, POINTS_WIDTH, POINTS_HEIGHT, OF_PRIMITIVE_TRIANGLES);
 	auto mi = mesh.getIndices();
 	mesh.getColors().resize(mi.size());
-	mesh.setColorForIndices(0, mi.size(), ofColor(255.0f));
+	mesh.setColorForIndices(0, mi.size(), ofColor(100.0f));
 
 	model = ofMatrix4x4::newIdentityMatrix();
-	model.postMultRotate(30.0f, 1.0f, 0.0f, 0.0f);
 	model.postMultRotate(-75.0f, 0.0f, 1.0f, 0.0f);
+	model.postMultRotate(30.0f, 1.0f, 0.0f, 0.0f);
 
 	for (int i = 0; i < mesh.getVertices().size(); i++)
 	{
-		mesh.setVertex(i, mesh.getVertex(i) * model);
+		mesh.setVertex(i, model * mesh.getVertex(i));
 	}
 
 	sim = ClothSim(&mesh);
@@ -30,10 +30,12 @@ void ofApp::setup(){
 
 	resetCloth();
 
+	cam.setAutoDistance(false);
 	cam.setNearClip(0.1f);
 	cam.setFarClip(1000.0f);
-	cam.setPosition(0.0, 2.0, -4.0);
-	cam.lookAt(ofVec3f(0.0, -1.0, 1.0));
+	cam.setPosition(ofVec3f(0.0f, 0.0f, -4.0f));
+	cam.lookAt(ofVec3f(0.0f, -1.0f, 0.0f), ofVec3f(0.0f, 1.0f, 0.0f));
+	cam.setTarget(ofVec3f(0.0f, -1.0f, 0.0f));
 }
 
 //--------------------------------------------------------------
@@ -56,7 +58,14 @@ void ofApp::update(){
 //--------------------------------------------------------------
 void ofApp::draw(){
 	ofClear(50.0f);
+
+	// Start camera
+	auto spotlight = ofLight();
+	spotlight.enable();
+	spotlight.lookAt(ofVec3f(0.0f, 0.0f, 1.0f));
 	cam.begin();
+
+	// Add lights
 
 	if (drawFrames)
 	{
@@ -67,10 +76,9 @@ void ofApp::draw(){
 		mesh.drawWireframe();
 	}
 
-	ofPushMatrix();
-	ofMultMatrix(model);
-	ofPopMatrix();
 	cam.end();
+	spotlight.disable();
+
 }
 
 //--------------------------------------------------------------
