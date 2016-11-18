@@ -11,10 +11,10 @@ void ofApp::resetCloth()
 	auto mi = mesh.getIndices();
 	mesh.getColors().resize(mi.size());
 	mesh.setColorForIndices(0, mi.size(), ofColor(100.0f));
-
+	
 	model = ofMatrix4x4::newIdentityMatrix();
+	model.postMultRotate(40.0f, 1.0f, 0.0f, 0.0f);
 	model.postMultRotate(-75.0f, 0.0f, 1.0f, 0.0f);
-	model.postMultRotate(30.0f, 1.0f, 0.0f, 0.0f);
 
 	for (int i = 0; i < mesh.getVertices().size(); i++)
 	{
@@ -30,6 +30,12 @@ void ofApp::setup(){
 
 	resetCloth();
 
+	light = ofLight();
+	light.setDiffuseColor(ofColor(ofColor::white));
+	light.setSpecularColor(ofColor(ofColor::whiteSmoke));
+	light.setPosition(ofVec3f(0.0f, 0.0f, 2.0f));
+	light.setPointLight();
+
 	cam.setAutoDistance(false);
 	cam.setNearClip(0.1f);
 	cam.setFarClip(1000.0f);
@@ -40,6 +46,8 @@ void ofApp::setup(){
 
 //--------------------------------------------------------------
 void ofApp::update(){
+
+	if (paused) return;
 
 	// Perform one full frame in the simulation
 	for (int i = 0; i < N_STEPS_PER_FRAME; i++)
@@ -60,9 +68,8 @@ void ofApp::draw(){
 	ofClear(50.0f);
 
 	// Start camera
-	auto spotlight = ofLight();
-	spotlight.enable();
-	spotlight.lookAt(ofVec3f(0.0f, 0.0f, 1.0f));
+	light.enable();
+
 	cam.begin();
 
 	// Add lights
@@ -77,7 +84,7 @@ void ofApp::draw(){
 	}
 
 	cam.end();
-	spotlight.disable();
+	light.disable();
 
 }
 
@@ -92,6 +99,18 @@ void ofApp::keyPressed(int key){
 	if (key == 'w')
 	{
 		drawFrames = !drawFrames;
+	}
+
+	if (key == ' ')
+	{
+		paused = !paused;
+	}
+
+	if (key == OF_KEY_RIGHT)
+	{
+		paused = !paused;
+		update();
+		paused = !paused;
 	}
 }
 

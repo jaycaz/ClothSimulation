@@ -10,8 +10,8 @@ const float INV_TIME_PER_STEP = 1.0f / TIME_PER_STEP;
 const float DT = N_STEPS_PER_FRAME * TIME_PER_STEP;
 const float DENSITY = 0.5f;
 
-const float BEND_STRENGTH = 0.0f;// 1.0f / 20000;
-const float STRETCH_STRENGTH = 0.0001f;
+const float BEND_STRENGTH = 0.01f;
+const float STRETCH_STRENGTH = 0.1f;
 
 const float BOUNDARY_SIZE = 3.0f;
 

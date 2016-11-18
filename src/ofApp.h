@@ -26,9 +26,11 @@ class ofApp : public ofBaseApp{
 		void resetCloth();
 
 		bool drawFrames = true;
+		bool paused = false;
 
 		ClothSim sim;
 
+		ofLight light;
 		ofEasyCam cam;
 		ofMesh mesh;
 		ofMatrix4x4 model;

@@ -89,7 +89,7 @@ ClothSim::ClothSim(ofMesh *mesh)
 		ofVec3f p4 = m->getVertex(t.p4);
 
 		ofVec3f t1 = (p2 - p1).crossed(p3 - p1).normalized();
-		ofVec3f t2 = (p1 - p2).crossed(p4 - p1).normalized();
+		ofVec3f t2 = (p2 - p1).crossed(p4 - p1).normalized();
 
 		float d = ofClamp(t1.dot(t2), -1.0f, 1.0f);
 		restBend.push_back(acosf(d));
