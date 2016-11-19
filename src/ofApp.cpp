@@ -20,11 +20,6 @@ void ofApp::resetCloth()
 		mesh.setVertex(i, model * mesh.getVertex(i));
 	}
 
-	//ofImage image;
-	//image.loadImage("textile.jpg");
-	//ofTexture tex = image.getTextureReference();
-	//mesh.addTexCoords(tex.
-
 	sim = ClothSim(&mesh);
 	int nPoints = POINTS_WIDTH * POINTS_HEIGHT;
 	sim.addPointPin(new PointPin(1558, mesh.getVertex(1558) + ofVec3f(0.2f, 0.0f, 0.0f)));
@@ -67,7 +62,6 @@ void ofApp::setup(){
 	cam.setPosition(ofVec3f(0.0f, 0.0f, -4.0f));
 	cam.lookAt(ofVec3f(0.0f, -1.0f, 0.0f), ofVec3f(0.0f, 1.0f, 0.0f));
 	cam.setTarget(ofVec3f(0.0f, -1.0f, 0.0f));
-
 }
 
 //--------------------------------------------------------------
@@ -76,11 +70,11 @@ void ofApp::update(){
 	if (paused) return;
 
 	// Perform one full frame in the simulation
-	for (int i = 0; i < N_STEPS_PER_FRAME; i++)
+	for (int i = 0; i < sim.N_STEPS_PER_FRAME; i++)
 	{
 		sim.startStep();
 		{
-			for (int j = 0; j < N_TICKS_PER_STEP; j++)
+			for (int j = 0; j < sim.N_TICKS_PER_STEP; j++)
 			{
 				sim.tick();
 			}
@@ -91,7 +85,8 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-	ofClear(ofColor::lightSteelBlue);
+	//ofClear(ofColor::lightSteelBlue);
+	ofBackground(ofColor::lightSteelBlue);
 
 	// Start camera
 	cam.begin();
@@ -164,20 +159,26 @@ void ofApp::mouseMoved(int x, int y ){
 	{
 		float minDist = numeric_limits<float>::max();
 		// Detect closest point to mouse and highlight it
+		selectIndex = -1;
+		ofIndexType minIndex = -1;
 		for (int i = 0; i < mesh.getVertices().size(); i++)
 		{
 			ofPoint vertex = cam.worldToScreen(mesh.getVertex(i));
 			float dist = vertex.distanceSquared(mouse);
 			if (dist < minDist)
 			{
-				selectIndex = i;
+				minIndex = i;
 				minDist = dist;
 			}
 			mesh.setColor(i, defaultColor);
 		}
 
-		mesh.setColor(selectIndex, ofColor::green);
-		cout << "Selected: " << selectIndex << " at " << mesh.getVertex(selectIndex) << endl;
+		if (sqrt(minDist) < 30.0f)
+		{
+			selectIndex = minIndex;
+			mesh.setColor(selectIndex, ofColor::green);
+			cout << "Selected: " << selectIndex << " at " << mesh.getVertex(selectIndex) << endl;
+		}
 	}
 }
 
@@ -185,12 +186,11 @@ void ofApp::mouseMoved(int x, int y ){
 void ofApp::mouseDragged(int x, int y, int button){
 	if (!camMode)
 	{
-		if (selectPin && button == OF_MOUSE_BUTTON_LEFT || button == OF_MOUSE_BUTTON_RIGHT)
+		if (selectIndex < mesh.getNumVertices() && selectPin)
 		{
 			ofPoint dm = cam.screenToWorld(ofPoint(x, y)) - cam.screenToWorld(mouse);
-			cout << "(dx,dy,dz) = " << dm << endl;
 
-			selectPin->target = selectStart + dm * MOUSE_DRAG_MULT;
+			selectPin->target = selectStart + dm * sim.MOUSE_DRAG_MULT;
 		}
 	}
 }
@@ -199,7 +199,7 @@ void ofApp::mouseDragged(int x, int y, int button){
 void ofApp::mousePressed(int x, int y, int button){
 	if (!camMode)
 	{
-		if (selectIndex >= 0 && selectIndex < mesh.getNumVertices())
+		if (selectIndex < mesh.getNumVertices())
 		{
 			selectPin = new PointPin();
 			selectPin->v = selectIndex;

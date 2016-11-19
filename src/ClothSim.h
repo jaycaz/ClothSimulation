@@ -2,24 +2,6 @@
 
 #include "ofMain.h"
 
-const int N_STEPS_PER_FRAME = 2;
-const int N_TICKS_PER_STEP = 4;
-const float RUN_SPEED = 1.0f;
-const float TIME_PER_STEP = 0.0083f * RUN_SPEED;
-const float INV_TIME_PER_STEP = 1.0f / TIME_PER_STEP;
-const float DT = N_STEPS_PER_FRAME * TIME_PER_STEP;
-const float DENSITY = 0.5f;
-
-const float DAMPING_K = 1.0f; // range: [0.0, 1.0]
-const float BEND_STRENGTH = 0.005f;
-const float STRETCH_STRENGTH = 1.0f;
-
-const float MOUSE_DRAG_MULT = 10.0f;
-
-const float BOUNDARY_SIZE = 3.0f;
-
-const float MASS = 1.0f;
-
 struct CollisionPlane
 {
 	CollisionPlane(ofVec3f o, ofVec3f n) { origin = o; normal = n.normalize(); }
@@ -57,6 +39,22 @@ struct PointPin
 class ClothSim
 {
 	public:
+		int N_STEPS_PER_FRAME = 2;
+		int N_TICKS_PER_STEP = 4;
+		float RUN_SPEED = 1.0f;
+		float TIME_PER_STEP = 0.0083f * RUN_SPEED;
+		float INV_TIME_PER_STEP = 1.0f / TIME_PER_STEP;
+		float DT = N_STEPS_PER_FRAME * TIME_PER_STEP;
+		float DENSITY = 0.5f;
+
+		float DAMPING_K = 1.0f; // range: [0.0, 1.0]
+		float BEND_STRENGTH = 0.005f;
+		float STRETCH_STRENGTH = 1.0f;
+
+		float MOUSE_DRAG_MULT = 10.0f;
+		float BOUNDARY_SIZE = 5.0f;
+		float MASS = 1.0f;
+
 		// Simulation parameters
 		int nPoints;
 		int nTris;
