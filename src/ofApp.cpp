@@ -13,8 +13,7 @@ void ofApp::resetCloth()
 	mesh.setColorForIndices(0, mi.size(), defaultColor);
 	
 	model = ofMatrix4x4::newIdentityMatrix();
-	model.postMultRotate(00.0f, 1.0f, 0.0f, 0.0f);
-	model.postMultRotate(-50.0f, 0.0f, 1.0f, 0.0f);
+	model.postMultRotate(30.0f, 0.0f, 1.0f, 0.0f);
 
 	for (int i = 0; i < mesh.getVertices().size(); i++)
 	{
@@ -28,8 +27,8 @@ void ofApp::resetCloth()
 
 	sim = ClothSim(&mesh);
 	int nPoints = POINTS_WIDTH * POINTS_HEIGHT;
-	sim.addPointPin(new PointPin(1558, mesh.getVertex(1558)));
-	sim.addPointPin(new PointPin(1521, mesh.getVertex(1521)));
+	sim.addPointPin(new PointPin(1558, mesh.getVertex(1558) + ofVec3f(0.2f, 0.0f, 0.0f)));
+	sim.addPointPin(new PointPin(1521, mesh.getVertex(1521) - ofVec3f(0.2f, 0.0f, 0.0f)));
 
 }
 
@@ -43,14 +42,22 @@ void ofApp::setup(){
 
 	// Setup light
 	light = ofLight();
-	light.setAmbientColor(ofColor(20.0f));
+	light.setAmbientColor(ofColor(10.0f));
 	light.setDiffuseColor(ofColor(ofColor::white));
 	light.setSpecularColor(ofColor(ofColor::white));
-	light.lookAt(ofVec3f(1.0f, 0.0f, 0.0f));
-	light.setPosition(ofVec3f(0.0f, 0.0f, 0.0f));
-	light.setScale(ofVec3f(4.0f));
-	light.setAttenuation(1.0f, 1.0f, 1.0f);
-	light.setPointLight();
+	light.setPosition(ofVec3f(0.0f, 0.0f, 4.0f));
+	light.setOrientation(ofVec3f(-45.0f, 0.0f, 0.0f));
+	light.setScale(ofVec3f(1.0f));
+	light.setDirectional();
+
+	light2 = ofLight();
+	light2.setAmbientColor(ofColor(10.0f));
+	light2.setDiffuseColor(ofColor(ofColor::white));
+	light2.setSpecularColor(ofColor(ofColor::white));
+	light2.setPosition(ofVec3f(0.0f, 0.0f, 4.0f));
+	light2.setOrientation(ofVec3f(45.0f, 0.0f, 0.0f));
+	light2.setScale(ofVec3f(1.0f));
+	light.setDirectional();
 
 	// Setup camera
 	cam.setAutoDistance(false);
@@ -84,11 +91,12 @@ void ofApp::update(){
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-	ofClear(50.0f);
+	ofClear(ofColor::lightSteelBlue);
 
 	// Start camera
 	cam.begin();
 	light.enable();
+	light2.enable();
 
 	if (drawFrames)
 	{
@@ -99,6 +107,7 @@ void ofApp::draw(){
 		mesh.drawWireframe();
 	}
 
+	light2.disable();
 	light.disable();
 	cam.end();
 

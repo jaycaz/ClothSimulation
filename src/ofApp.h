@@ -38,6 +38,7 @@ class ofApp : public ofBaseApp{
 		ClothSim sim;
 
 		ofLight light;
+		ofLight light2;
 		ofEasyCam cam;
 		ofMesh mesh;
 		ofMatrix4x4 model;
